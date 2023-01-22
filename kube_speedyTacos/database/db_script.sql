@@ -1,0 +1,5 @@
+CREATE TABLE ORDINAZIONI (
+    numero_ordine SERIAL PRIMARY KEY,
+    tavolo CHAR(255) NOT NULL,
+    tacos CHAR(255) NOT NULL
+);

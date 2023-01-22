@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-ordini-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-principale-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-ordini
+  template:
+    metadata:
+      labels:
+        app: db-ordini
+    spec:
+      containers:
+      - name: db-ordini
+        image: ecarta/database-ordini:latest
+        ports:
+        - containerPort: 5342
+        volumeMounts:
+        - name: db-ordini-storage
+          mountPath: /data
+      volumes:
+      - name: db-ordini-storage
+        persistentVolumeClaim:
+          claimName: db-ordini-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-ordini-service # Sets service name
+  labels:
+    app: db-ordini # Labels and Selectors
+spec:
+  type: LoadBalancer # Sets service type
+  selector:
+    app: db-ordini
+  ports:
+    - name: db-port
+      port: 5432 # Sets port to run the postgres application
+      targetPort: 5432
