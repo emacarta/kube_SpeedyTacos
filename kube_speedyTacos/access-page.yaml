@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: access-page-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: access-page
+  template:
+    metadata:
+      labels:
+        app: access-page
+    spec:
+      containers:
+      - name: access-page
+        image: ecarta/access-page:latest
+        ports:
+        - containerPort: 8030
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: access-page-service # Sets service name
+  labels:
+    app: access-page # Labels and Selectors
+spec:
+  type: LoadBalancer # Sets service type
+  selector:
+    app: access-page
+  ports:
+    - name: access-page-port
+      port: 8030 # Sets port to run the postgres application
+      targetPort: 80
